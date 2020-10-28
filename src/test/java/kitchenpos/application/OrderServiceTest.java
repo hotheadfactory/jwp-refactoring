@@ -15,7 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -98,5 +100,23 @@ class OrderServiceTest {
 
         assertThatThrownBy(() -> orderService.create(order))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("한 번에 모든 주문 상태를 조회하는 테스트")
+    void listTest() {
+        Order order1 = new Order();
+        Order order2 = new Order();
+        Order order3 = new Order();
+        OrderLineItem orderLineItem = new OrderLineItem();
+
+        given(orderDao.findAll()).willReturn(Arrays.asList(order1, order2, order3));
+        given(orderLineItemDao.findAllByOrderId(any())).willReturn(Collections.singletonList(orderLineItem));
+
+        List<Order> orderList = orderService.list();
+        assertThat(orderList.size()).isEqualTo(3);
+        for (Order order : orderList) {
+            assertThat(order.getOrderLineItems().contains(orderLineItem));
+        }
     }
 }
