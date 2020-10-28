@@ -6,6 +6,7 @@ import kitchenpos.dao.OrderLineItemDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -118,5 +119,35 @@ class OrderServiceTest {
         for (Order order : orderList) {
             assertThat(order.getOrderLineItems().contains(orderLineItem));
         }
+    }
+
+    @Test
+    @DisplayName("주문 상태를 변경하는 테스트")
+    void changeOrderStatusTest() {
+        Order savedOrder = new Order();
+        savedOrder.setOrderStatus(OrderStatus.COOKING.name());
+        Order changedOrder = new Order();
+        changedOrder.setOrderStatus(OrderStatus.MEAL.name());
+
+        given(orderDao.findById(any())).willReturn(java.util.Optional.of(savedOrder));
+
+        Order order = orderService.changeOrderStatus(1L, changedOrder);
+
+        assertThat(order).isEqualTo(savedOrder);
+        assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.MEAL.name());
+    }
+
+    @Test
+    @DisplayName("계산이 완료된 주문은 상태를 변경할 수 없음을 테스트")
+    void completedOrderExceptionTest() {
+        Order savedOrder = new Order();
+        savedOrder.setOrderStatus(OrderStatus.COMPLETION.name());
+        Order changedOrder = new Order();
+        changedOrder.setOrderStatus(OrderStatus.MEAL.name());
+
+        given(orderDao.findById(any())).willReturn(java.util.Optional.of(savedOrder));
+
+        assertThatThrownBy(() -> orderService.changeOrderStatus(1L, changedOrder))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
