@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import java.util.Arrays;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.domain.OrderTable;
@@ -40,5 +41,16 @@ class TableServiceTest {
         given(orderTableDao.save(any())).willReturn(orderTable);
 
         assertThat(tableService.create(orderTable)).isEqualTo(orderTable);
+    }
+
+    @Test
+    @DisplayName("테이블을 조회하는 테스트")
+    void list() {
+        OrderTable orderTable1 = new OrderTable();
+        OrderTable orderTable2 = new OrderTable();
+
+        given(orderTableDao.findAll()).willReturn(Arrays.asList(orderTable1, orderTable2));
+
+        assertThat(tableService.list()).hasSize(2);
     }
 }
