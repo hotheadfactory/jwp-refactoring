@@ -9,6 +9,7 @@ import java.util.Arrays;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.domain.OrderTable;
+import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -99,6 +100,52 @@ class TableServiceTest {
         given(orderDao.existsByOrderTableIdAndOrderStatusIn(any(), any())).willReturn(true);
 
         assertThatThrownBy(() -> tableService.changeEmpty(savedOrderTable.getId(), orderTable))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("테이블의 손님 수를 변경하는 테스트")
+    void changeNumberOfGuests() {
+        OrderTable orderTable = new OrderTable();
+        OrderTable savedOrderTable = new OrderTable();
+        orderTable.setId(1L);
+        orderTable.setNumberOfGuests(3);
+        savedOrderTable.setId(1L);
+        savedOrderTable.setEmpty(false);
+
+        given(orderTableDao.findById(any())).willReturn(java.util.Optional.of(savedOrderTable));
+        given(orderTableDao.save(any())).willReturn(orderTable);
+
+        OrderTable changedOrderTable = tableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable);
+        assertThat(changedOrderTable.getNumberOfGuests()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("바꾸려는 손님 수가 0보다 작을 때 예외 처리")
+    void changeNumberOfGuestsWithInvalidNumber() {
+        OrderTable orderTable = new OrderTable();
+        OrderTable savedOrderTable = new OrderTable();
+        orderTable.setId(1L);
+        orderTable.setNumberOfGuests(-1);
+        savedOrderTable.setId(1L);
+
+        assertThatThrownBy(() -> tableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("테이블이 비어있을 때 손님 수를 변경하려고 할 때 예외 처리")
+    void changeNumberOfGuestsWhenTableIsEmpty() {
+        OrderTable orderTable = new OrderTable();
+        OrderTable savedOrderTable = new OrderTable();
+        orderTable.setId(1L);
+        orderTable.setNumberOfGuests(100);
+        savedOrderTable.setId(1L);
+        savedOrderTable.setEmpty(true);
+
+        given(orderTableDao.findById(any())).willReturn(java.util.Optional.of(savedOrderTable));
+
+        assertThatThrownBy(() -> tableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable))
             .isInstanceOf(IllegalArgumentException.class);
     }
 }
