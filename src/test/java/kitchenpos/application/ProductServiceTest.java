@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -39,5 +40,26 @@ class ProductServiceTest {
         given(productDao.save(any())).willReturn(product);
 
         assertThat(productService.create(product)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("가격이 0 미만인 상품을 등록하는 경우 예외 처리")
+    void createWithPriceUnderZero() {
+        Product product = new Product();
+        product.setName("후라이드 치킨");
+        product.setPrice(BigDecimal.valueOf(-10000));
+
+        assertThatThrownBy(() -> productService.create(product))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("가격이 Null인 상품을 등록할 경우 예외 처리")
+    void createWithNullPrice() {
+        Product product = new Product();
+        product.setName("후라이드 치킨");
+
+        assertThatThrownBy(() -> productService.create(product))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 }
