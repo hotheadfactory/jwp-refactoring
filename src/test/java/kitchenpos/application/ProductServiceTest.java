@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import kitchenpos.dao.ProductDao;
 import kitchenpos.domain.Product;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,10 +22,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ProductServiceTest {
 
     @Mock
-    ProductDao productDao;
+    private ProductDao productDao;
 
     @InjectMocks
-    ProductService productService;
+    private ProductService productService;
 
     @BeforeEach
     void setUp() {
@@ -61,5 +63,18 @@ class ProductServiceTest {
 
         assertThatThrownBy(() -> productService.create(product))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("상품 목록 조회 테스트")
+    void list() {
+        Product product1 = new Product();
+        Product product2 = new Product();
+        Product product3 = new Product();
+        Product product4 = new Product();
+
+        given(productDao.findAll()).willReturn(Arrays.asList(product1, product2, product3, product4));
+        List<Product> list = productService.list();
+        assertThat(list.size()).isEqualTo(4);
     }
 }
