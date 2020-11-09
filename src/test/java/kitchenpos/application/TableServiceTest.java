@@ -1,15 +1,8 @@
 package kitchenpos.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
-import java.util.Arrays;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.domain.OrderTable;
-import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +10,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class TableServiceTest {
@@ -85,7 +85,7 @@ class TableServiceTest {
         given(orderTableDao.findById(any())).willReturn(java.util.Optional.of(savedOrderTable));
 
         assertThatThrownBy(() -> tableService.changeEmpty(savedOrderTable.getId(), orderTable))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -100,7 +100,7 @@ class TableServiceTest {
         given(orderDao.existsByOrderTableIdAndOrderStatusIn(any(), any())).willReturn(true);
 
         assertThatThrownBy(() -> tableService.changeEmpty(savedOrderTable.getId(), orderTable))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -130,7 +130,7 @@ class TableServiceTest {
         savedOrderTable.setId(1L);
 
         assertThatThrownBy(() -> tableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -146,6 +146,6 @@ class TableServiceTest {
         given(orderTableDao.findById(any())).willReturn(java.util.Optional.of(savedOrderTable));
 
         assertThatThrownBy(() -> tableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

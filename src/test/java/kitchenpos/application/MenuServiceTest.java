@@ -137,8 +137,5 @@ class MenuServiceTest {
                 () -> assertThat(menus.get(1).getMenuProducts()).containsExactly(menuProduct2),
                 () -> assertThat(menus.get(2).getMenuProducts()).containsExactly(menuProduct3)
         );
-
-
     }
-
 }
