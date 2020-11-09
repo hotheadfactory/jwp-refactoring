@@ -83,4 +83,44 @@ class TableGroupServiceTest {
         assertThatThrownBy(() -> tableGroupService.create(tableGroup))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    @DisplayName("그룹을 해제할 경우에 대한 테스트")
+    void ungroupTest() {
+        OrderTable orderTable1 = new OrderTable();
+        OrderTable orderTable2 = new OrderTable();
+        TableGroup tableGroup = new TableGroup();
+
+        orderTable1.setEmpty(false);
+        orderTable2.setEmpty(false);
+        tableGroup.setOrderTables(Arrays.asList(orderTable1, orderTable2));
+        tableGroup.setId(1L);
+
+        when(orderTableDao.findAllByTableGroupId(any()))
+                .thenReturn(Arrays.asList(orderTable1, orderTable2));
+        when(orderDao.existsByOrderTableIdInAndOrderStatusIn(any(), any())).thenReturn(false);
+
+        assertDoesNotThrow(() -> tableGroupService.ungroup(1L));
+    }
+
+    @Test
+    @DisplayName("그룹 안의 테이블이 조리/식사 중일 경우 테이블 그룹 해제 불가")
+    void ungroupUnavailableTest() {
+        OrderTable orderTable1 = new OrderTable();
+        OrderTable orderTable2 = new OrderTable();
+        TableGroup tableGroup = new TableGroup();
+
+        orderTable1.setEmpty(false);
+        orderTable2.setEmpty(true);
+        tableGroup.setOrderTables(Arrays.asList(orderTable1, orderTable2));
+        tableGroup.setId(1L);
+
+
+        when(orderTableDao.findAllByTableGroupId(any()))
+                .thenReturn(Arrays.asList(orderTable1, orderTable2));
+        when(orderDao.existsByOrderTableIdInAndOrderStatusIn(any(), any())).thenReturn(true);
+
+        assertThatThrownBy(() -> tableGroupService.ungroup(1L))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
